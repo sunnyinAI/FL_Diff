@@ -11,6 +11,7 @@ class flask:
     state = None
     clients=0
     ids = 0
+    closed=False
     def __init__(self,args):
         flask.clients = int(args.clients)
         flask.ids=int(args.clients)
@@ -18,6 +19,8 @@ class flask:
 def add(flask):
     while flask.c<flask.ids:
         time.sleep(0.05)
+        if flask.closed:
+            return None
         if flask.state is not None:
             break
     if flask.state is  None:
@@ -28,7 +31,10 @@ def add(flask):
             flask.state_list[0][key]/=flask.ids
         flask.state = flask.state_list[0]
 
-        
+@app.route('/close', methods=['POST'])
+def close():
+    flask.closed=True
+    return 'closing',200        
 
 @app.route('/getid', methods=['POST'])
 def getid():
@@ -58,6 +64,15 @@ def upload():
     flask.state_list[file[0]]=file[1]
     flask.c+=1
     add(flask)
+    if flask.closed:
+        flask.c-=1
+        flask.state_list = {}
+        flask.state = None
+        response=make_response(pickle.dumps("closed"))
+        response.headers['Content-Type'] = 'application/octet-stream'
+        if flask.c==0:
+            print("closing from server side")
+        return response,400
     # print(file)
     response=make_response(pickle.dumps(flask.state))
     response.headers['Content-Type'] = 'application/octet-stream'
