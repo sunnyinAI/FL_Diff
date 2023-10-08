@@ -79,16 +79,18 @@ def upload():
     flask.c-=1
     # print(flask.state)
     if flask.c==0:
+        if args.save_model:
+            with open('file.pkl', 'wb') as file: 
+                pickle.dump(flask.state, file) 
         flask.state_list = {}
         flask.state = None
-
-
     return response, 200 
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--clients",help="number of clients particiapting")
+    parser.add_argument("--save_model",help="True for saving the global model after each iteration",default=True)
     args=parser.parse_args()
     # pritn(args)
     obj=flask(args)

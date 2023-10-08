@@ -1,26 +1,13 @@
-import torch
 import pickle
 import requests
 import json
 import time
-url = 'http://127.0.0.1:5000/upload'
-class MyModel(torch.nn.Module):
-    def __init__(self):
-        super(MyModel, self).__init__()
-        self.fc = torch.nn.Linear(3, 1)
 
-    def forward(self, x):
-        return self.fc(x)
-
-# Create an instance of the model
-model = MyModel()
-
-import pickle
-import requests
 class client:
-    def __init__(self):
+    def __init__(self,url='127.0.0.1:5000'):
+        self.url=url
 
-        response = requests.post('http://127.0.0.1:5000/getid')
+        response = requests.post(f'http://{self.url}/getid')
         if response.status_code == 200:
             self.ids = int(response.content)
             print("connection id ",self.ids)
@@ -34,8 +21,7 @@ class client:
         # Print the state dictionary
         # print(model_state_dict)
         a=pickle.dumps((self.ids,model_state_dict))
-        #       a=model_state_dict
-        response = requests.post(url, data=a,headers = {'Content-Type': 'application/octet-stream'})
+        response = requests.post(url = f'http://{self.url}/upload', data=a,headers = {'Content-Type': 'application/octet-stream'})
         # print(response.content)
         if response.status_code!=200:
             return False
@@ -43,7 +29,7 @@ class client:
         return True
         # return pickle.loads(response.content)
     def __del__(self,):
-        response = requests.post('http://127.0.0.1:5000/close')
+        response = requests.post(f'http://{self.url}/close')
         if response.status_code ==200:
             print("closing initiated")
 

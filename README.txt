@@ -10,11 +10,11 @@ example shown in
 		python3 server.py --clients 2 # 2 clients participating
 
 	clients side
-		import client as client
+		from client import client
 		obj=client()
 		..... After each iteration ....
-			  stop=obj.merge(model)
-			  #if stop is true is server side is closed so stop training.
+			  ON=obj.merge(model)
+			  #if ON is False is server side is closed so stop training.
 		...............................	  
 		
 		del obj # onces training is finished in any client ,
